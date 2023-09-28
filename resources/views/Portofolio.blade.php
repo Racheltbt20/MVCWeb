@@ -44,7 +44,7 @@
                     <div class="navbar-nav ms-auto">
                         <a class="nav-link active" href="{{ route('home') }}">Home</a>
                         <a class="nav-link active" href="{{ route('about') }}">About</a>
-                        <a class="nav-link active" href="{{ route('projects') }}">Projects</a>
+                        <a class="nav-link active" href="{{ route('projecthome') }}">Projects</a>
                         <a class="nav-link active" href="{{ route('contact') }}">Contact</a>
                         <a class="nav-link active" href="{{ route('admin') }}">Admin</a>
                     </div>

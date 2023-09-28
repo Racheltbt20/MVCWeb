@@ -2,40 +2,139 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Siswa;
 use App\Models\Project;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProjectsController extends Controller
 {
-    //read
-    Public function index() {
-        $data = Project::all();
-        return $data;
+    public function projecthome() {
+        return view('projects');
     }
 
-    //create
-    public function create() {
-
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        $siswas = Siswa::all('id', 'name');
+        return view('admin.masterproject', compact('siswas'));
     }
 
-    //simpan data create
-    public function store(Request $request) {
-        Project::create($request->all());
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+
+    }
+    
+    public function add($id) {  
+        $siswa = Siswa::find($id);
+        return view('admin.tambahproject', compact('siswa'));
+    }
+    
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        // custom message
+        $message=[
+            'required' => 'Heh ketinggalan :attribute mu',
+            'min' => 'kurang :attribute mu,  minimal :min karakter',
+            'max' => 'kelebihan :atrribute mu, maksimal :max karakter',
+            'mimes' => 'file :attribute salah, harus bertipe jpg, jpeg, atau png'
+        ];
+
+        $validatedData = $request->validate([
+            'project_name' => 'required|min:5|max:20',
+            'project_date' => 'required',
+            'photo' => 'required|mimes:jpg,jpeg,png'
+        ], $message);
+
+        $validatedData['siswa_id'] = $request->siswa_id;
+
+        $validatedData['photo'] = $request->file('photo')->store('project');
+
+        Project::create($validatedData);
+
+        return redirect()->route('project.index')->with('success', 'Data project berhasil ditambahkan!');
     }
 
-    //edit
-    public function edit($id) {
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $data = Siswa::find($id)->project()->get();
+        return view('admin.showproject', compact('data'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        $project = Project::find($id);
+        return view('admin.editproject', compact('project'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $project = Project::find($id);
+
+        // custom message
+        $message=[
+            'required' => 'Heh ketinggalan :attribute mu',
+            'min' => 'kurang :attribute mu,  minimal :min karakter',
+            'max' => 'kelebihan :atrribute mu, maksimal :max karakter',
+            'mimes' => 'file :attribute salah, harus bertipe jpg, jpeg, atau png'
+        ];
+
+        // validasi request form
+        $validatedData = $request->validate([
+            'project_name' => 'required|min:5|max:20',
+            'project_date' => 'required',
+            'photo' => 'mimes:jpg,jpeg,png'
+        ], $message);
+
+        
+        if($request->file('photo')) {
+            if($request->oldProject) {
+                Storage::delete($request->oldProject);
+            }
+            $validatedData['photo'] = $request->file('photo')->store('project');
+        }
+        
+        // Project::find($id)->update($request->all());
+
+        // Project::where('id', $request->id)
+        //         ->update($validatedData);
+
+        $project->update($validatedData);
+
+        return redirect()->route('project.index')->with('success', 'Data project berhasil diubah!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
         $data = Project::find($id);
-        return $data;
-    }
 
-    //simpan data edit
-    public function update($id, Request $request) {
-        Project::find($id)->update([$request->all()]);
-    }
+        if($data->photo) {
+            Storage::delete($data->photo);
+        }
 
-    //delete
-    public function delete($id) {
-        Project::find($id)->delete();
+        $data->delete();
+
+        return redirect()->route('project.index')->with('success', 'Data project berhasil dihapus!');
     }
 }
+ 

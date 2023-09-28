@@ -3,9 +3,9 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ProjectsController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MasterController;
+use App\Http\Controllers\ProjectsController;
 use App\Http\Controllers\SiswaController;
 use Faker\Guesser\Name;
 use Illuminate\Support\Facades\Route;
@@ -28,8 +28,8 @@ use Illuminate\Support\Facades\Route;
 // @quest
 Route::get('/', [HomeController::class, 'index']) ->name('home');
 Route::get('/about', [AboutController::class, 'index']) ->name('about');
-Route::get('/projects', [ProjectsController::class, 'index']) ->name('projects');
-Route::get('/contact', [ContactController::class, 'index']) ->name('contact');
+Route::get('/projects', [ProjectsController::class, 'projecthome']) ->name('projecthome');
+Route::get('/contact', [ContactController::class, 'contact']) ->name('contact');
 
 // @auth
 Route::get('/admin', [AdminController::class, 'index']) ->name('admin');
@@ -43,12 +43,8 @@ Route::put('/admin/siswa/{id}', [SiswaController::class, 'update']) ->name('sisw
 Route::delete('/admin/siswa/{id}', [SiswaController::class, 'delete']) ->name('siswa.delete');
 
 // Master Project
-Route::get('/admin/project', [ProjectsController::class, 'index']) ->name('project.index');
-Route::get('/admin/project/create', [ProjectsController::class, 'create']) ->name('project.create');
-Route::post('/admin/project/store', [ProjectsController::class, 'store']) ->name('project.store');
-Route::get('/admin/project/{id}/edit', [ProjectsController::class, 'edit']) ->name('project.edit');
-Route::put('/admin/project/{id}', [ProjectController::class, 'update']) ->name('project.update');
-Route::delete('/admin/project/{id}', [ProjectController::class, 'delete']) ->name('project.delete');
+Route::resource('/admin/project', ProjectsController::class);
+Route::get('/admin/project/{id}/create', [ProjectsController::class, 'add'])->name('project.add');
 
 // Master Contact
 Route::get('/admin/contact', [ContactController::class, 'index']) ->name('contact.index');
