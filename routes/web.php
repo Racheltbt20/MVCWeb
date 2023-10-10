@@ -60,6 +60,7 @@ Route::delete('/admin/contact/{id}', [ContactController::class, 'delete']) ->nam
 Route::get('/login', [LoginController::class, 'index']) ->name('login.index')->middleware('guest');
 Route::post('/login', [LoginController::class, 'authenticate']) ->name('login.auth');
 Route::post('/logout', [LoginController::class, 'logout']) ->name('logout');
+Route::get('/logout', [LoginController::class, 'abort']) ->name('abortlogout');
 
 // Registrasi
 Route::get('/registrasi', [RegistrasiController::class, 'index']) ->name('registrasi.index');

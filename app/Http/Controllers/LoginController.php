@@ -43,4 +43,8 @@ class LoginController extends Controller
         
         return redirect()->route('login.index');
     }
+
+    public function abort() {
+        abort(404);
+    }
 }
