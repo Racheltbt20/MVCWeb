@@ -27,42 +27,52 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/halaman2', [HomeController::class, 'halaman2']);
 // Route::get('/portofolio', [HomeController::class, 'portofolio']);
 
-// @guest
+// @auth
+Route::middleware('auth')->group(function() {
+    Route::get('/admin', [AdminController::class, 'index']) ->name('admin');
+
+    // Master Siswa
+    Route::get('/admin/siswa', [SiswaController::class, 'index']) ->name('siswa.index');
+
+    // Master Project
+    Route::resource('/admin/project', ProjectsController::class);
+    Route::get('/admin/project/{id}/create', [ProjectsController::class, 'add'])->name('project.add');
+
+    // Master Contact
+    Route::get('/admin/contact', [ContactController::class, 'index']) ->name('contact.index');
+    Route::get('/admin/contact/create', [ContactController::class, 'create']) ->name('contact.create');
+    Route::post('/admin/contact/store', [ContactController::class, 'store']) ->name('contact.store');
+    Route::get('/admin/contact/{id}/edit', [ContactController::class, 'edit']) ->name('contact.edit');
+    Route::put('/admin/contact/{id}', [ContactController::class, 'update']) ->name('contact.update');
+    Route::delete('/admin/contact/{id}', [ContactController::class, 'delete']) ->name('contact.delete');
+});
+
 Route::get('/', [HomeController::class, 'index']) ->name('home');
 Route::get('/about', [AboutController::class, 'index']) ->name('about');
 Route::get('/projects', [ProjectsController::class, 'projecthome']) ->name('projecthome');
 Route::get('/contact', [ContactController::class, 'contact']) ->name('contact');
 
-// @auth
-Route::get('/admin', [AdminController::class, 'index']) ->name('admin')->middleware('auth');
-
-// Master Siswa
-Route::get('/admin/siswa', [SiswaController::class, 'index']) ->name('siswa.index')->middleware('auth');
-Route::get('/admin/siswa/create', [SiswaController::class, 'create']) ->name('siswa.create')->middleware('auth');
-Route::post('/admin/siswa/store', [SiswaController::class, 'store']) ->name('siswa.store')->middleware('auth');
-Route::get('/admin/siswa/{id}/edit', [SiswaController::class, 'edit']) ->name('siswa.edit')->middleware('auth');
-Route::put('/admin/siswa/{id}', [SiswaController::class, 'update']) ->name('siswa.update')->middleware('auth');
-Route::delete('/admin/siswa/{id}', [SiswaController::class, 'delete']) ->name('siswa.delete')->middleware('auth');
-
-// Master Project
-Route::resource('/admin/project', ProjectsController::class)->middleware('auth');
-Route::get('/admin/project/{id}/create', [ProjectsController::class, 'add'])->name('project.add')->middleware('auth');
-
-// Master Contact
-Route::get('/admin/contact', [ContactController::class, 'index']) ->name('contact.index')->middleware('auth');
-Route::get('/admin/contact/create', [ContactController::class, 'create']) ->name('contact.create')->middleware('auth');
-Route::post('/admin/contact/store', [ContactController::class, 'store']) ->name('contact.store')->middleware('auth');
-Route::get('/admin/contact/{id}/edit', [ContactController::class, 'edit']) ->name('contact.edit')->middleware('auth');
-Route::put('/admin/contact/{id}', [ContactController::class, 'update']) ->name('contact.update')->middleware('auth');
-Route::delete('/admin/contact/{id}', [ContactController::class, 'delete']) ->name('contact.delete')->middleware('auth');
-
-// Login
-Route::get('/login', [LoginController::class, 'index']) ->name('login.index')->middleware('guest');
-Route::post('/login', [LoginController::class, 'authenticate']) ->name('login.auth');
-Route::post('/logout', [LoginController::class, 'logout']) ->name('logout');
 Route::get('/logout', [LoginController::class, 'abort']) ->name('abortlogout');
+Route::post('/logout', [LoginController::class, 'logout']) ->name('logout');
 
-// Registrasi
-Route::get('/registrasi', [RegistrasiController::class, 'index']) ->name('registrasi.index');
-Route::post('/registrasi', [RegistrasiController::class, 'store']) ->name('registrasi.store');
+// @guest
+Route::middleware('guest')->group(function() {
+    // Login
+    Route::get('/login', [LoginController::class, 'index']) ->name('login.index');
+    Route::post('/login', [LoginController::class, 'authenticate']) ->name('login.auth');
 
+    // Registrasi
+    Route::get('/registrasi', [RegistrasiController::class, 'index']) ->name('registrasi.index');
+    Route::post('/registrasi', [RegistrasiController::class, 'store']) ->name('registrasi.store');
+});
+
+// @admin
+Route::middleware(['auth', 'role:admin'])->group(function() {
+    // Master Siswa
+    Route::get('/admin/siswa/create', [SiswaController::class, 'create']) ->name('siswa.create');
+    Route::post('/admin/siswa/store', [SiswaController::class, 'store']) ->name('siswa.store');
+    Route::get('/admin/siswa/{id}/edit', [SiswaController::class, 'edit']) ->name('siswa.edit');
+    Route::put('/admin/siswa/{id}', [SiswaController::class, 'update']) ->name('siswa.update');
+    Route::delete('/admin/siswa/{id}', [SiswaController::class, 'delete']) ->name('siswa.delete');
+
+});

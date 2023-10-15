@@ -13,6 +13,11 @@ class ProjectsController extends Controller
         return view('projects');
     }
 
+    public function __construct()
+    {
+        $this->middleware(['role:admin'])->except('index', 'show', 'projecthome');
+    }
+
     /**
      * Display a listing of the resource.
      */
